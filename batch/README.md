@@ -18,7 +18,7 @@ This project uses DefaultAWSCredentialsProviderChain which looks for AWS credent
 
 ## Build JAR
 
-Run below command to build the jar file and copy it to the docker folder for building the image later.
+Below command builds the jar file and copies it to the docker folder.
 
 ```
 mvn package spring-boot:repackage antrun:run@docker
@@ -29,5 +29,5 @@ mvn package spring-boot:repackage antrun:run@docker
 Run below command with proper S3 URL for file copy.
 
 ```
-java -jar s3-batch-processing-1.0-SNAPSHOT.jar --source=s3://<url> --destination=s3://<url>
+java -jar s3-batch-processing-1.0-SNAPSHOT.jar --source=s3:// --destination=s3://
 ```
