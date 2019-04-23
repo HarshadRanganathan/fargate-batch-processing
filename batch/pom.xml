@@ -4,17 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.fargate</groupId>
-        <artifactId>fargate-batch-processing</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </parent>
-
     <name>S3 Batch Processing</name>
+    <groupId>com.fargate.batch</groupId>
     <artifactId>s3-batch-processing</artifactId>
+    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jdk.version>1.8</jdk.version>
         <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
         <springboot.version>2.1.4.RELEASE</springboot.version>
         <awssdk.version>1.11.534</awssdk.version>
@@ -61,6 +59,10 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>${jdk.version}</source>
+                        <target>${jdk.version}</target>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.springframework.boot</groupId>

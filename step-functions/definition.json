@@ -1,0 +1,29 @@
+{
+  "StartAt": "Fargate Task",
+  "States": {
+    "Fargate Task": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "Parameters": {
+        "LaunchType": "FARGATE",
+        "Cluster": "arn:aws:ecs:REGION:ACCOUNT-ID:cluster/s3-batch-processing",
+        "TaskDefinition": "arn:aws:ecs:REGION:ACCOUNT-ID:task-definition/s3-batch-processing:1",
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": ["SUBNET"],
+            "AssignPublicIp": "DISABLED"
+          }
+        },
+        "Overrides": {
+          "ContainerOverrides": [
+            {
+              "Name": "s3-batch-processing",
+              "Command.$": "$.commands"
+            }
+          ]
+        }
+      },
+      "End": true
+    }
+  }
+}

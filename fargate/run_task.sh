@@ -4,7 +4,8 @@ usage() {
     echo $'\n'"Usage: $0 --cluster {cluster} --task-definition {task-definition} --source {source} --destination {destination}
     Mandatory parameters:
         --cluster           {cluster}           Cluster name e.g. s3-batch-processing
-        --task-definition   {task-definition}   Family and revision (family:revision ) or full ARN of the task definition to run
+        --task-definition   {task-definition}   Family and revision (family:revision) or full ARN of the task definition to run
+        --subnet            {subnet}            Subnet (private)
         --source            {source}            S3 source file URL
         --destination       {destination}       S3 Destination URL
     ";
@@ -30,6 +31,11 @@ while [[ $# -gt 0 ]];
             echo "TASK_DEFINITION ${TASK_DEFINITION}"
             shift 2
             ;;
+        --subnet)
+            SUBNET=${2}
+            echo "SUBNET          ${SUBNET}"
+            shift 2
+            ;;
         --source)
             SOURCE=${2}
             echo "SOURCE          ${SOURCE}"
@@ -49,14 +55,14 @@ while [[ $# -gt 0 ]];
      done
 echo "-------------------------------------------------"
 
-if [[ ! "$CLUSTER" ]] || [[ ! "$TASK_DEFINITION" ]] || [[ ! "$SOURCE" ]] || [[ ! "$DESTINATION" ]] ; then
+if [[ ! "$CLUSTER" ]] || [[ ! "$TASK_DEFINITION" ]] || [[ ! "$SUBNET" ]] || [[ ! "$SOURCE" ]] || [[ ! "$DESTINATION" ]] ; then
     usage
 fi
 
 NETWORK_CONFIGURATION=$(cat <<-EOF
 {
   "awsvpcConfiguration": {
-    "subnets": ["subnet-e7ab4abe"],
+    "subnets": ["${SUBNET}"],
     "assignPublicIp": "DISABLED"
   }
 }
