@@ -21,5 +21,5 @@ Execute `run_task.sh` script to run the cluster task in a private subnet (no pub
 ```
 # e.g. cluster -> s3-batch-processing 
 # e.g. task-definition -> s3-batch-processing:1 
-./run_task.sh --cluster {cluster} --task-definition {task-definition} --source {source} --destination {destination}
+./run_task.sh --cluster {cluster} --task-definition {task-definition} --subnet {subnet} --source {source} --destination {destination}
 ```
