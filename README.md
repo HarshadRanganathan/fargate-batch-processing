@@ -2,7 +2,7 @@
 
 Sample spring batch processing job launched in fargate to copy files in S3. We use step functions to orchestrate the flow.
 
-![Flow](flow.png?raw=true)
+![Flow](Flow.png?raw=true)
 
 # How To Run
 
