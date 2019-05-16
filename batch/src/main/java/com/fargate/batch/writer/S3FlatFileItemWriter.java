@@ -12,10 +12,12 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.support.AbstractItemStreamItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,6 +43,8 @@ public class S3FlatFileItemWriter<T> extends AbstractItemStreamItemWriter<T> imp
 
     private static final String DEFAULT_LINE_SEPARATOR = "\n";
 
+    private volatile byte[] currentBuffer;
+
     @Override
     public void beforeStep(StepExecution stepExecution) {
         final AmazonS3URI amazonS3URI = new AmazonS3URI(destination);
@@ -62,16 +66,21 @@ public class S3FlatFileItemWriter<T> extends AbstractItemStreamItemWriter<T> imp
     public void write(List<? extends T> items) {
         final String content = items.stream().map(item -> item.toString()).collect(Collectors.joining(DEFAULT_LINE_SEPARATOR));
         byte[] contentAsBytes = content.getBytes(StandardCharsets.UTF_8);
+        currentBuffer = ArrayUtils.addAll(currentBuffer, contentAsBytes);
 
-        final UploadPartRequest uploadPartRequest = new UploadPartRequest()
-                .withBucketName(this.s3Bucket)
-                .withKey(this.s3Key)
-                .withUploadId(this.initiateMultipartUploadResult.getUploadId())
-                .withPartNumber(this.partNumber)
-                .withInputStream(new ByteArrayInputStream(contentAsBytes))
-                .withPartSize(Math.min(partSize, contentAsBytes.length));
-        final UploadPartResult uploadPartResult = amazonS3.uploadPart(uploadPartRequest);
-        partETags.add(uploadPartResult.getPartETag());
+        if(currentBuffer.length > partSize) {
+            byte[] uploadBuffer = Arrays.copyOf(currentBuffer, currentBuffer.length);
+            currentBuffer = new byte[0];
+            final UploadPartRequest uploadPartRequest = new UploadPartRequest()
+                    .withBucketName(this.s3Bucket)
+                    .withKey(this.s3Key)
+                    .withUploadId(this.initiateMultipartUploadResult.getUploadId())
+                    .withPartNumber(this.partNumber)
+                    .withInputStream(new ByteArrayInputStream(uploadBuffer))
+                    .withPartSize(Math.min(partSize, uploadBuffer.length));
+            final UploadPartResult uploadPartResult = amazonS3.uploadPart(uploadPartRequest);
+            partETags.add(uploadPartResult.getPartETag());
+        }
     }
 
     @Override
